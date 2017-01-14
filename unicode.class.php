@@ -62,7 +62,7 @@ class Unicode
 				$n += ord($c[3]) & 0x3f;
 				break;
 		}
-		return "U+".base_convert($n, 10, 16);
+		return "\u" . $this->addzero(base_convert($n, 10, 16));
 	}
 
 	/**
@@ -74,7 +74,7 @@ class Unicode
 	 */
 	public function str_from_unicode($str, $out_charset = 'gbk')
 	{
-		$str = preg_replace_callback("|U\+([0-9a-f]{1,4})|", array($this, 'unicode2utf8_'), $str);
+		$str = preg_replace_callback("|\\\u([0-9a-f]{1,4})|", array($this, 'unicode2utf8_'), $str);
 		$str = iconv("UTF-8", $out_charset, $str);
 		return $str;
 	}
@@ -105,5 +105,13 @@ class Unicode
 		}
 		return $str;
 	}
+     private function addzero($str, $len = 4) {
+        $str_len = strlen((String)$str);
+        if ($str_len == $len) {
+            return $str;
+        }
+        $needn = max($len - $str_len,0);
+        return str_repeat('0', $needn).$str;
+    }
 }
 
